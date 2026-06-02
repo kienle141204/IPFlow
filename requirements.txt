@@ -1,0 +1,41 @@
+# ============================================================
+# IPFlow requirements
+# ============================================================
+# For Google Colab, run the cell below BEFORE pip install:
+#
+#   !pip install torch==2.2.0 torchvision --index-url https://download.pytorch.org/whl/cu121
+#   !pip install torch-geometric
+#   !pip install torch-scatter torch-sparse torch-cluster torch-spline-conv \
+#       -f https://data.pyg.org/whl/torch-2.2.0+cu121.html
+#   !apt-get install -y openbabel libopenbabel-dev
+#   !pip install -r requirements.txt
+#
+# On a local machine with conda, use IPDiff/ipdiff.yml instead.
+# ============================================================
+
+# ------ Core ML ------
+# torch and torch-geometric installed separately (version depends on CUDA)
+# See Colab cell above or https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html
+numpy>=1.22
+scipy>=1.7
+scikit-learn>=1.0
+
+# ------ Chemistry ------
+rdkit>=2022.03.5
+openbabel-wheel>=3.1.1.1        # fallback if apt openbabel unavailable
+biopython>=1.79
+mdtraj>=1.9.7
+meeko>=0.1.0                    # Vina docking prep
+vina>=1.2.2                     # AutoDock Vina Python bindings
+
+# ------ Data / IO ------
+lmdb>=1.4.1
+easydict>=1.9
+pyyaml>=6.0
+yacs>=0.1.6
+
+# ------ Utils ------
+tqdm>=4.64
+networkx>=2.7
+pandas>=1.4
+matplotlib>=3.5

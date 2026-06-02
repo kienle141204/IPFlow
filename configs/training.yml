@@ -1,0 +1,88 @@
+# ============================================================
+# IPFlow (IPFM) training configuration
+# ============================================================
+# Paths — override these for your local setup.
+data:
+  name: pl
+  path: data/crossdocked_pocket10        # output of scripts/data_preparation/extract_pockets.py
+  split: data/crossdocked_pocket10_pose_split.pt  # output of scripts/data_preparation/split_pl_dataset.py
+  transform:
+    ligand_atom_mode: add_aromatic   # same as IPDiff
+    random_rot: False
+
+# Frozen IPNet (BAPNet) checkpoint path
+net_cond:
+  ckpt_path: data/pretrained_models/ipnet  # copy from IPDiff/pretrained_models/ipnet
+  hidden_dim: 128                          # IPNet feature dim = cond_dim
+
+# ============================================================
+# Model
+# ============================================================
+model:
+  # Prior-conditioning feature dimension (must match IPNet hidden_dim)
+  cond_dim: 128
+
+  # Weighted loss coefficient for atom-type cross-entropy
+  loss_v_weight: 100.0
+
+  # Center positions around protein CoM
+  center_pos_mode: protein
+
+  # Node indicator: append 0/1 bit to distinguish protein/ligand
+  node_indicator: True
+
+  # ---- Time embedding for ligand features ----
+  time_emb_dim: 64                   # 0 to disable sinusoidal embedding
+
+  # ---- ShiftMLP hyperparameters ----
+  shift_time_emb_dim: 64             # sinusoidal dim inside ShiftMLP
+  shift_hidden_dim: 128              # hidden dim of ShiftMLP (~50K params)
+
+  # ---- IPNet noise augmentation ----
+  # Gaussian noise sigma added to ligand positions before IPNet (training only)
+  ipnet_noise_sigma: 0.5
+  # Smaller noise at inference for stability
+  infer_ipnet_noise_sigma: 0.1
+
+  # ---- UniTransformerO2 backbone ----
+  num_blocks: 1
+  num_layers: 9
+  hidden_dim: 128
+  n_heads: 16
+  edge_feat_dim: 4                   # edge-type one-hot (p-p, p-l, l-p, l-l)
+  num_r_gaussian: 20
+  knn: 32
+  num_node_types: 8
+  act_fn: relu
+  norm: True
+  cutoff_mode: knn
+  ew_net_type: global
+  num_x2h: 1
+  num_h2x: 1
+  r_max: 10.0
+  x2h_out_fc: False
+  sync_twoup: False
+
+# ============================================================
+# Training
+# ============================================================
+train:
+  seed: 2021
+  batch_size: 4
+  num_workers: 4
+  n_acc_batch: 1                     # gradient accumulation steps
+  max_iters: 1000000
+  val_freq: 5000
+  pos_noise_std: 0.1                 # protein position noise (augmentation)
+  max_grad_norm: 8.0
+  optimizer:
+    type: adam
+    lr: 1.0e-3
+    weight_decay: 0
+    beta1: 0.95
+    beta2: 0.999
+  scheduler:
+    type: plateau
+    factor: 0.6
+    patience: 10
+    min_lr: 1.0e-6

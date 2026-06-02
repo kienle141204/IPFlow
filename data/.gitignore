@@ -1,0 +1,6 @@
+# Ignore large data files, keep directory structure
+*
+!.gitignore
+!**/.gitkeep
+!pretrained_models/
+!pretrained_models/**/.gitkeep
